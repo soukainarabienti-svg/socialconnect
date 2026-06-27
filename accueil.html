@@ -1,0 +1,1795 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="color-scheme" content="dark">
+    <title>SocialConnect - Accueil</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        :root {
+            --bg: #0b141a;
+            --bg-panel: #111b21;
+            --bg-elevated: #202c33;
+            --bg-active: #2a3942;
+            --accent: #00a884;
+            --accent-soft: #0a332c;
+            --text-primary: #e9edef;
+            --text-secondary: #8696a0;
+            --border: #1f2c34;
+            --border-strong: #222e35;
+        }
+
+        :root[data-theme="light"] {
+            --bg: #f7f9fa;
+            --bg-panel: #ffffff;
+            --bg-elevated: #eef2f3;
+            --bg-active: #e3e8ea;
+            --accent: #008069;
+            --accent-soft: #d9f2ea;
+            --text-primary: #111b21;
+            --text-secondary: #667781;
+            --border: #e9edef;
+            --border-strong: #e0e0e0;
+        }
+
+        html, body { height: 100vh; height: 100dvh; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; }
+        }
+
+        button:focus-visible,
+        [role="button"]:focus-visible,
+        input:focus-visible,
+        textarea:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        header {
+            background-color: var(--bg);
+            padding: 15px 20px 5px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 { color: var(--accent); font-size: 24px; font-weight: bold; }
+
+        .header-icons { display: flex; align-items: center; gap: 20px; }
+
+        .header-icon {
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--text-primary);
+            background: none;
+            border: none;
+            border-radius: 8px;
+            padding: 4px;
+        }
+
+        .search-container { padding: 10px 20px; }
+
+        .search-bar {
+            width: 100%;
+            background-color: var(--bg-elevated);
+            border-radius: 20px;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-bar input {
+            background: none;
+            border: none;
+            outline: none;
+            color: var(--text-primary);
+            font-size: 15px;
+            width: 100%;
+        }
+
+        .search-bar input::placeholder { color: var(--text-secondary); }
+
+        .filters-container {
+            display: flex;
+            gap: 8px;
+            padding: 5px 20px 15px 20px;
+            overflow-x: auto;
+        }
+
+        .filters-container::-webkit-scrollbar { display: none; }
+
+        .filter-badge {
+            background-color: var(--bg-elevated);
+            color: var(--text-secondary);
+            border: none;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            white-space: nowrap;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .filter-badge.active { background-color: var(--accent-soft); color: var(--accent); }
+
+        main { flex: 1; overflow-y: auto; position: relative; min-height: 0; }
+
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+
+        .empty-state {
+            padding: 60px 30px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .item-row {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            background: none;
+            border-left: none;
+            border-right: none;
+            border-top: none;
+            color: inherit;
+        }
+
+        .item-row:active, .item-row:hover { background-color: var(--bg-elevated); }
+
+        .avatar-mock {
+            width: 48px;
+            height: 48px;
+            background-color: var(--bg-active);
+            border-radius: 50%;
+            margin-right: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .avatar-green { background-color: var(--accent); color: var(--bg); }
+        .avatar-rose { background-color: #e11d48; }
+        .avatar-blue { background-color: #2563eb; }
+        .avatar-amber { background-color: #d97706; }
+        .avatar-bot { background-color: var(--accent); color: #fff; }
+        .avatar-ring { border: 2px solid var(--accent); background: transparent; }
+
+        .item-text {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-width: 0;
+        }
+
+        .text-main { min-width: 0; flex: 1; }
+
+        .text-main h3 { font-size: 16px; color: var(--text-primary); font-weight: 500; margin-bottom: 4px; }
+
+        .text-main p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .item-row[data-unread="true"] h3 { font-weight: 700; }
+        .item-row[data-unread="true"] p { color: var(--text-primary); font-weight: 500; }
+
+        .section-title {
+            padding: 20px 20px 10px 20px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* --- FORMULAIRES / PAGES DE RÉGLAGES --- */
+        .text-field {
+            width: 100%;
+            background-color: var(--bg-elevated);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 14px;
+            color: var(--text-primary);
+            font-size: 15px;
+            outline: none;
+            margin-bottom: 16px;
+        }
+
+        .field-label { display: block; font-size: 13px; color: var(--text-secondary); margin-bottom: 6px; }
+
+        .primary-btn {
+            width: 100%;
+            background-color: var(--accent);
+            color: var(--bg);
+            border: none;
+            border-radius: 10px;
+            padding: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .secondary-btn {
+            width: 100%;
+            background-color: var(--bg-elevated);
+            color: var(--text-primary);
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-bottom: 16px;
+        }
+
+        .small-btn {
+            background-color: var(--bg-elevated);
+            color: var(--accent);
+            border: none;
+            border-radius: 8px;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .status-textarea {
+            width: 100%;
+            background-color: var(--bg-elevated);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 14px;
+            color: var(--text-primary);
+            font-size: 15px;
+            outline: none;
+            resize: vertical;
+            margin: 12px 0;
+            font-family: inherit;
+        }
+
+        .read-receipt { font-size: 11px; color: var(--text-secondary); margin-left: 4px; }
+
+        /* --- PAGE PARAMÈTRES DU PROFIL --- */
+        .profile-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .profile-avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background-color: var(--bg-active);
+            background-size: cover;
+            background-position: center;
+            border: none;
+            font-size: 32px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .profile-fields { flex: 1; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+        .profile-field { display: flex; align-items: center; gap: 8px; }
+
+        .profile-field-text {
+            font-size: 16px;
+            color: var(--text-primary);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        #profile-status-text { font-size: 14px; color: var(--text-secondary); }
+
+        .profile-field-input {
+            flex: 1;
+            background-color: var(--bg-elevated);
+            border: none;
+            border-radius: 8px;
+            padding: 6px 10px;
+            color: var(--text-primary);
+            font-size: 15px;
+            outline: none;
+            min-width: 0;
+        }
+
+        .edit-icon-btn {
+            background: none;
+            border: none;
+            font-size: 15px;
+            cursor: pointer;
+            flex-shrink: 0;
+            border-radius: 6px;
+        }
+
+        .toggle-switch { position: relative; display: inline-block; width: 46px; height: 26px; flex-shrink: 0; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+
+        .toggle-slider {
+            position: absolute;
+            inset: 0;
+            background-color: var(--bg-active);
+            border-radius: 26px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .toggle-slider::before {
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            left: 3px;
+            top: 3px;
+            background-color: var(--text-primary);
+            border-radius: 50%;
+            transition: transform 0.2s;
+        }
+
+        .toggle-switch input:checked + .toggle-slider { background-color: var(--accent); }
+        .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); background-color: #fff; }
+        .toggle-switch input:focus-visible + .toggle-slider { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+        /* --- BOUTONS FLOTTANTS --- */
+        .fab-container {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 5;
+        }
+
+        .fab-ai, .fab-add { border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+
+        .fab-ai {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #a445f7, #5d26ff);
+            border-radius: 14px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+        }
+
+        .fab-add {
+            width: 55px;
+            height: 55px;
+            background-color: var(--accent);
+            border-radius: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: var(--bg);
+        }
+
+        .sub-page-panel {
+            position: fixed;
+            top: 0;
+            left: 100%;
+            width: 100vw;
+            height: 100dvh;
+            background-color: var(--bg);
+            z-index: 9999;
+            transition: left 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sub-page-panel.open { left: 0; }
+
+        .sub-page-header {
+            background-color: var(--bg-panel);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-strong);
+            flex-shrink: 0;
+        }
+
+        .header-left { display: flex; align-items: center; min-width: 0; }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 24px;
+            margin-right: 20px;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+
+        .sub-page-header h2 { font-size: 19px; color: var(--text-primary); font-weight: 500; }
+        .sub-page-header p { font-size: 13px; color: var(--text-secondary); }
+
+        .header-right-icons { display: flex; gap: 20px; color: var(--text-primary); font-size: 18px; }
+        .header-right-icons button { background: none; border: none; color: inherit; font-size: inherit; cursor: pointer; }
+
+        .chat-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+
+        .bubble {
+            max-width: 75%;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 14.5px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .bubble.them { background-color: var(--bg-elevated); align-self: flex-start; border-top-left-radius: 2px; }
+        .bubble.me { background-color: var(--accent-soft); color: var(--text-primary); align-self: flex-end; border-top-right-radius: 2px; }
+
+        .chat-input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            background-color: var(--bg-panel);
+            border-top: 1px solid var(--border-strong);
+            flex-shrink: 0;
+        }
+
+        .chat-input-row input {
+            flex: 1;
+            background-color: var(--bg-elevated);
+            border: none;
+            border-radius: 20px;
+            padding: 10px 16px;
+            color: var(--text-primary);
+            font-size: 15px;
+            outline: none;
+        }
+
+        .send-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background-color: var(--accent);
+            color: var(--bg);
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background-color: var(--bg-elevated);
+            color: var(--text-primary);
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            z-index: 10000;
+            max-width: 80vw;
+            text-align: center;
+        }
+
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        .bottom-nav {
+            background-color: var(--bg-panel);
+            border-top: 1px solid var(--border-strong);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            flex-shrink: 0;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-secondary);
+            font-size: 12px;
+            cursor: pointer;
+            gap: 4px;
+            flex: 1;
+            background: none;
+            border: none;
+        }
+
+        .nav-item .icon-wrapper { padding: 4px 20px; border-radius: 16px; font-size: 20px; transition: background-color 0.2s; }
+        .nav-item.active { color: var(--text-primary); font-weight: bold; }
+        .nav-item.active .icon-wrapper { background-color: var(--accent-soft); color: var(--accent); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>SocialConnect</h1>
+        <div class="header-icons">
+            <button class="header-icon" aria-label="Ajouter un statut photo" onclick="openStatusComposer()">📷</button>
+            <button class="header-icon" aria-label="Paramètres" onclick="openSubPage('profile-sub-page')">⋮</button>
+        </div>
+    </header>
+
+    <div class="search-container">
+        <div class="search-bar">
+            <span aria-hidden="true">🔍</span>
+            <input id="search-input" type="text" placeholder="Demander à l'IA ou rechercher" oninput="filterChatsBySearch(this.value)" aria-label="Rechercher une discussion">
+        </div>
+    </div>
+
+    <div class="filters-container" role="group" aria-label="Filtrer les discussions">
+        <button class="filter-badge active" data-filter="all" onclick="setChatFilter('all')">Toutes</button>
+        <button class="filter-badge" data-filter="unread" onclick="setChatFilter('unread')">Non lues</button>
+        <button class="filter-badge" data-filter="favorite" onclick="setChatFilter('favorite')">Favoris</button>
+        <button class="filter-badge" data-filter="group" onclick="setChatFilter('group')">Groupes</button>
+    </div>
+
+    <main>
+
+        <!-- Onglet Discussions -->
+        <div id="chats-section" class="content-section active">
+            <div id="chats-list">
+                <button class="item-row" data-name="IA SocialConnect" data-unread="false" data-favorite="true" data-group="false" onclick="openChat('IA SocialConnect')">
+                    <div class="avatar-mock avatar-bot" aria-hidden="true">🤖</div>
+                    <div class="item-text">
+                        <div class="text-main">
+                            <h3>IA SocialConnect</h3>
+                            <p>Bonjour ! Prêt à discuter avec moi ?</p>
+                        </div>
+                    </div>
+                </button>
+            </div>
+            <p id="chats-empty-state" class="empty-state" hidden>Aucune discussion ne correspond à ce filtre.</p>
+        </div>
+
+        <!-- Onglet Actus (Statut) -->
+        <div id="status-section" class="content-section">
+            <button class="item-row" onclick="openStatusComposer()">
+                <div class="avatar-mock avatar-ring" id="my-status-avatar" aria-hidden="true">👤</div>
+                <div class="item-text">
+                    <div class="text-main">
+                        <h3>Mon Statut</h3>
+                        <p id="my-status-subtitle">Appuyez pour ajouter une mise à jour</p>
+                    </div>
+                </div>
+            </button>
+            <div class="section-title" id="statuses-section-title" hidden>Mises à jour</div>
+            <div id="statuses-list"></div>
+        </div>
+
+        <!-- Onglet Communautés -->
+        <div id="communities-section" class="content-section">
+            <button class="item-row" onclick="openNewCommunityForm()">
+                <div class="avatar-mock" aria-hidden="true">👥</div>
+                <div class="item-text">
+                    <div class="text-main">
+                        <h3>Nouvelle communauté</h3>
+                        <p>Organisez vos groupes et vos membres</p>
+                    </div>
+                </div>
+            </button>
+            <div id="communities-list"></div>
+        </div>
+
+        <!-- Onglet Appels -->
+        <div id="calls-section" class="content-section">
+            <button class="item-row" onclick="createCallLink()">
+                <div class="avatar-mock" aria-hidden="true">📞</div>
+                <div class="item-text">
+                    <div class="text-main">
+                        <h3>Créer un lien d'appel</h3>
+                        <p>Partager un lien pour votre appel</p>
+                    </div>
+                </div>
+            </button>
+            <div class="section-title" id="call-links-title" hidden>Liens créés</div>
+            <div id="call-links-list"></div>
+        </div>
+
+        <div class="fab-container">
+            <button id="fab-main" class="fab-add" aria-label="Nouvelle discussion" onclick="openContactsPage()">💬</button>
+        </div>
+
+        <!-- --- PARAMÈTRES DU PROFIL --- -->
+        <div id="profile-sub-page" class="sub-page-panel" role="dialog" aria-label="Paramètres du profil">
+            <div class="sub-page-header">
+                <div class="header-left">
+                    <button class="back-btn" aria-label="Retour" onclick="closeSubPage('profile-sub-page')">←</button>
+                    <h2>Paramètres du profil</h2>
+                </div>
+            </div>
+
+            <div style="overflow-y: auto; flex: 1;">
+                <div class="profile-card">
+                    <button class="profile-avatar" id="profile-avatar-btn" aria-label="Changer la photo de profil" onclick="document.getElementById('avatar-file-input').click()">🙂</button>
+                    <input type="file" id="avatar-file-input" accept="image/*" hidden onchange="handleAvatarUpload(event)">
+                    <div class="profile-fields">
+                        <div class="profile-field">
+                            <span class="profile-field-text" id="profile-name-text">Votre nom</span>
+                            <input class="profile-field-input" id="profile-name-input" type="text" value="Votre nom" hidden onkeydown="if(event.key==='Enter'){saveProfileEdit('name');}" onblur="saveProfileEdit('name')">
+                            <button class="edit-icon-btn" aria-label="Modifier le nom" onclick="toggleProfileEdit('name')">✏️</button>
+                        </div>
+                        <div class="profile-field">
+                            <span class="profile-field-text" id="profile-status-text">Salut ! J'utilise SocialConnect</span>
+                            <input class="profile-field-input" id="profile-status-input" type="text" value="Salut ! J'utilise SocialConnect" hidden onkeydown="if(event.key==='Enter'){saveProfileEdit('status');}" onblur="saveProfileEdit('status')">
+                            <button class="edit-icon-btn" aria-label="Modifier le statut" onclick="toggleProfileEdit('status')">✏️</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-title">Préférences</div>
+
+                <div class="item-row" style="cursor: default;">
+                    <div class="avatar-mock" aria-hidden="true">🌓</div>
+                    <div class="item-text">
+                        <div class="text-main"><h3>Thème sombre</h3><p>Basculer entre clair et sombre</p></div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="theme-toggle" checked aria-label="Activer le thème sombre" onchange="toggleTheme(this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <button class="item-row" onclick="openSubPage('account-sub-page')">
+                    <div class="avatar-mock" aria-hidden="true">🔑</div>
+                    <div class="item-text"><div class="text-main"><h3>Compte</h3><p>Téléphone, e-mail</p></div></div>
+                </button>
+
+                <button class="item-row" onclick="openSubPage('privacy-sub-page')">
+                    <div class="avatar-mock" aria-hidden="true">🔒</div>
+                    <div class="item-text"><div class="text-main"><h3>Confidentialité</h3><p>Statut en ligne, confirmations de lecture</p></div></div>
+                </button>
+
+                <button class="item-row" onclick="openSubPage('notifications-sub-page')">
+                    <div class="avatar-mock" aria-hidden="true">🔔</div>
+                    <div class="item-text"><div class="text-main"><h3>Notifications</h3><p>Son, aperçu des messages</p></div></div>
+                </button>
+
+                <button class="item-row" onclick="openStorageSettings()">
+                    <div class="avatar-mock" aria-hidden="true">💾</div>
+                    <div class="item-text"><div class="text-main"><h3>Stockage et données</h3><p>Statistiques, effacer les discussions</p></div></div>
+                </button>
+
+                <div class="section-title">Assistance</div>
+
+                <button class="item-row" onclick="openSubPage('help-sub-page')">
+                    <div class="avatar-mock" aria-hidden="true">❓</div>
+                    <div class="item-text"><div class="text-main"><h3>Aide</h3><p>Centre d'aide</p></div></div>
+                </button>
+
+                <button class="item-row" onclick="inviteFriend()">
+                    <div class="avatar-mock" aria-hidden="true">📨</div>
+                    <div class="item-text"><div class="text-main"><h3>Inviter un ami</h3></div></div>
+                </button>
+
+                <button class="item-row" onclick="confirmLogout(this)">
+                    <div class="avatar-mock" aria-hidden="true">🚪</div>
+                    <div class="item-text"><div class="text-main"><h3 style="color: #f87171;">Se déconnecter</h3></div></div>
+                </button>
+            </div>
+        </div>
+
+        <!-- --- COMPTE --- -->
+        <div id="account-sub-page" class="sub-page-panel" role="dialog" aria-label="Compte">
+            <div class="sub-page-header">
+                <div class="header-left">
+                    <button class="back-btn" aria-label="Retour" onclick="closeSubPage('account-sub-page')">←</button>
+                    <h2>Compte</h2>
+                </div>
+            </div>
+            <div style="overflow-y:auto; flex:1;">
+                <div class="profile-field" style="padding:16px 20px;">
+                    <div style="flex:1; min-width:0;">
+                        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:4px;">Téléphone</p>
+                        <span class="profile-field-text" id="profile-account-phone-text">+33 6 12 34 56 78</span>
+                        <input class="profile-field-input" id="profile-account-phone-input" type="tel" value="+33 6 12 34 56 78" hidden onkeydown="if(event.key==='Enter'){saveProfileEdit('account-phone');}" onblur="saveProfileEdit('account-phone')">
+                    </div>
+                    <button class="edit-icon-btn" aria-label="Modifier le téléphone" onclick="toggleProfileEdit('account-phone')">✏️</button>
+                </div>
+                <div class="profile-field" style="padding:16px 20px; border-top:1px solid var(--border);">
+                    <div style="flex:1; min-width:0;">
+                        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:4px;">E-mail</p>
+                        <span class="profile-field-text" id="profile-account-email-text">vous@example.com</span>
+                        <input class="profile-field-input" id="profile-account-email-input" type="email" value="vous@example.com" hidden onkeydown="if(event.key==='Enter'){saveProfileEdit('account-email');}" onblur="saveProfileEdit('account-email')">
+                    </div>
+                    <button class="edit-icon-btn" aria-label="Modifier l'e-mail" onclick="toggleProfileEdit('account-email')">✏️</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- --- CONFIDENTIALITÉ --- -->
+        <div id="privacy-sub-page" class="sub-page-panel" role="dialog" aria-label="Confidentialité">
+            <div class="sub-page-header">
+                <div class="header-left">
+                    <button class="back-btn" aria-label="Retour" onclick="closeSubPage('privacy-sub-page')">←</button>
+                    <h2>Confidentialité</h2>
+                </div>
+            </div>
+            <div style="overflow-y:auto; flex:1;">
+                <div class="item-row" style="cursor:default;">
+                    <div class="avatar-mock" aria-hidden="true">🟢</div>
+                    <div class="item-text">
+                        <div class="text-main"><h3>Statut en ligne</h3><p>Visible dans tes discussions</p></div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="setting-online" checked aria-label="Afficher le statut en ligne" onchange="updateSetting('onlineStatus', this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="item-row" style="cursor:default;">
+                    <div class="avatar-mock" aria-hidden="true">✓✓</div>
+                    <div class="item-text">
+                        <div class="text-main"><h3>Confirmations de lecture</h3><p>Afficher ✓✓ sur tes messages envoyés</p></div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="setting-read-receipts" checked aria-label="Activer les confirmations de lecture" onchange="updateSetting('readReceipts', this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- --- NOTIFICATIONS --- -->
+        <div id="notifications-sub-page" class="sub-page-panel" role="dialog" aria-label="Notifications">
+            <div class="sub-page-header">
+                <div class="header-left">
+                    <button class="back-btn" aria-label="Retour" onclick="closeSubPage('notifications-sub-page')">←</button>
+                    <h2>Notifications</h2>
+                </div>
+            </div>
+            <div style="overflow-y:auto; flex:1;">
+                <div class="item-row" style="cursor:default;">
+                    <div class="avatar-mock" aria-hidden="true">🔊</div>
+                    <div class="item-text">
+                        <div class="text-main"><h3>Son</h3><p>Jouer un son à la réception d'un message</p></div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="setting-sound" checked aria-label="Activer le son des notifications" onchange="updateSetting('notifSound', this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="item-row" style="cursor:default;">
+                    <div class="avatar-mock" aria-hidden="true">👁️</div>
+                    <div class="item-text">
+                        <div class="text-main"><h3>Aperçu des messages</h3><p>Afficher le texte dans la liste</p></div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="setting-preview" checked aria-label="Afficher l'aperçu des messages" onchange="updateSetting('notifPreview', this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- --- STOCKAGE --- -->
+        <div id="storage-sub-page" class="sub-page-panel" role="dialog" aria-label="Stockage et données">
+            <div class="sub-page-header">
+                <div class="header-left">
+                    <button class="back-btn" aria-label="Retour" onclick="closeSubPage('storage-sub-page')">←</button>
+                    <h2>Stockage et données</h2>
+                </div>
+            </div>
+            <div style="padding:20px;">
+                <p id="storage-stats" style="color:var(--text-secondary); margin-bottom:20px; line-height:1.6;"></p>
+                <button class="primary-btn" style="background-color:#dc2626; color:#fff;" id="clear-chats-btn" onclick="confirmClearChats()">Vider toutes les discussions</button>
+            </div>
+        </div>
+
+        <!-- --- AIDE --- -->
+        <div id="help-sub-page" class="sub-page-panel" role="dialog" aria-label="Aide">
+            <div class="sub-page-header">
+                <div class="header-left">
+                    <button class="back-btn" aria-label="Retour" onclick="closeSubPage('help-sub-page')">←</button>
+                    <h2>Aide</h2>
+                </div>
+            </div>
+            <div style="padding:20px; overflow-y:auto; flex:1;">
+                <div class="section-title" style="padding-left:0;">Questions fréquentes</div>
+                <p style="margin-bottom:16px; line-height:1.6;"><strong>Comment démarrer une discussion ?</strong><br>Appuie sur le bouton 💬 en bas à droite, puis choisis un contact.</p>
+                <p style="margin-bottom:16px; line-height:1.6;"><strong>Comment créer un groupe ?</strong><br>Depuis la liste des contacts, choisis « Nouveau groupe », sélectionne des membres et donne-lui un nom.</p>
+                <p style="margin-bottom:16px; line-height:1.6;"><strong>Comment créer une communauté ?</strong><br>Dans l'onglet Communautés, appuie sur « Nouvelle communauté ».</p>
+                <p style="margin-bottom:16px; line-height:1.6;"><strong>Mes données sont-elles sauvegardées ?</strong><br>Cette version fonctionne entièrement dans ton navigateur, sans serveur : tout est effacé si tu fermes ou recharges la page.</p>
+            </div>
+        </div>
+
+        <!-- --- SÉLECTIONNER UN CONTACT --- -->
+        <div id="contacts-sub-page" class="sub-page-panel" role="dialog" aria-label="Sélectionner un contact">
+            <div class="sub-page-header">
+                <div class="header-left">
+                    <button class="back-btn" aria-label="Retour" onclick="closeSubPage('contacts-sub-page')">←</button>
+                    <div>
+                        <h2>Sélectionner un contact</h2>
+                        <p id="contacts-count">3 contacts</p>
+                    </div>
+                </div>
+            </div>
+            <div class="search-container">
+                <div class="search-bar">
+                    <span aria-hidden="true">🔍</span>
+                    <input id="contacts-search-input" type="text" placeholder="Rechercher un contact" aria-label="Rechercher un contact" oninput="renderContactsList(this.value)">
+                </div>
+            </div>
+
+            <div style="overflow-y: auto; flex: 1;">
+                <button class="item-row" onclick="openNewGroupForm()">
+                    <div class="avatar-mock avatar-green" aria-hidden="true">👥</div>
+                    <div class="item-text"><div class="text-main"><h3>Nouveau groupe</h3></div></div>
+                </button>
+
+                <button class="item-row" onclick="openNewContactForm()">
+                    <div class="avatar-mock avatar-green" aria-hidden="true">👤</div>
+                    <div class="item-text"><div class="text-main"><h3>Nouveau contact</h3></div></div>
+                </button>
+
+                <div class="section-title">Contacts sur SocialConnect</div>
+                <div id="contacts-list"></div>
+            </div>
+        </div>
+
+        <!-- --- NOUVEAU CONTACT --- -->
+        <div id="new-contact-sub-page" class="sub-page-panel" role="dialog" aria-label="Nouveau contact">
+            <div class="sub-page-header">
+                <div class="header-left">
+                    <button class="back-btn" aria-label="Annuler" onclick="closeSubPage('new-contact-sub-page')">←</button>
+                    <h2>Nouveau contact</h2>
+                </div>
+            </div>
+            <div style="padding:20px;">
+                <label class="field-label" for="new-contact-name">Nom</label>
+                <input id="new-contact-name" class="text-field" type="text" placeholder="Nom du contact" onkeydown="if(event.key==='Enter'){addNewContact();}">
+                <button class="primary-btn" onclick="addNewContact()">Ajouter</button>
+            </div>
+        </div>
+
+        <!-- --- NOUVEAU GROUPE --- -->
+        <div id="new-group-sub-page" class="sub-page-panel" role="dialog" aria-label="Nouveau groupe">
+            <div class="sub-page-header">
+                <div class="header-left">
+                    <button class="back-btn" aria-label="Annuler" onclick="closeSubPage('new-group-sub-page')">←</button>
+                    <h2>Nouveau groupe</h2>
+                </div>
+            </div>
+            <div style="overflow-y:auto; flex:1; padding: 16px 20px;">
+                <label class="field-label" for="new-group-name">Nom du groupe</label>
+                <input id="new-group-name" class="text-field" type="text" placeholder="Ex : Amis du lycée">
+                <div class="section-title" style="padding-left:0;">Sélectionner des membres</div>
+                <div id="group-contact-picker"></div>
+                <button class="primary-btn" onclick="createGroup()">Créer le groupe</button>
+            </div>
+        </div>
+
+        <!-- --- NOUVELLE COMMUNAUTÉ --- -->
+        <div id="new-community-sub-page" class="sub-page-panel" role="dialog" aria-label="Nouvelle communauté">
+            <div class="sub-page-header">
+                <div class="header-left">
+                    <button class="back-btn" aria-label="Annuler" onclick="closeSubPage('new-community-sub-page')">←</button>
+                    <h2>Nouvelle communauté</h2>
+                </div>
+            </div>
+            <div style="overflow-y:auto; flex:1; padding:16px 20px;">
+                <label class="field-label" for="new-community-name">Nom</label>
+                <input id="new-community-name" class="text-field" type="text" placeholder="Ex : Quartier des Lilas">
+                <label class="field-label" for="new-community-desc">Description (optionnel)</label>
+                <input id="new-community-desc" class="text-field" type="text" placeholder="De quoi parle cette communauté ?">
+                <div class="section-title" style="padding-left:0;">Membres</div>
+                <div id="community-contact-picker"></div>
+                <button class="primary-btn" onclick="createCommunity()">Créer la communauté</button>
+            </div>
+        </div>
+
+        <!-- --- DÉTAIL COMMUNAUTÉ --- -->
+        <div id="community-detail-sub-page" class="sub-page-panel" role="dialog" aria-label="Communauté">
+            <div class="sub-page-header">
+                <div class="header-left">
+                    <button class="back-btn" aria-label="Retour" onclick="closeSubPage('community-detail-sub-page')">←</button>
+                    <h2 id="community-detail-name">Communauté</h2>
+                </div>
+            </div>
+            <div style="overflow-y:auto; flex:1; padding:20px;">
+                <p id="community-detail-desc" style="color:var(--text-secondary); margin-bottom:16px;"></p>
+                <div class="section-title" style="padding-left:0;">Membres</div>
+                <div id="community-detail-members"></div>
+                <button class="primary-btn" id="community-open-chat-btn" style="margin-top:20px;">💬 Ouvrir la discussion du groupe</button>
+            </div>
+        </div>
+
+        <!-- --- NOUVEAU STATUT --- -->
+        <div id="status-composer-sub-page" class="sub-page-panel" role="dialog" aria-label="Nouveau statut">
+            <div class="sub-page-header">
+                <div class="header-left">
+                    <button class="back-btn" aria-label="Annuler" onclick="closeSubPage('status-composer-sub-page')">←</button>
+                    <h2>Nouveau statut</h2>
+                </div>
+            </div>
+            <div style="padding: 20px; flex: 1; overflow-y:auto;">
+                <div id="status-photo-preview" hidden style="margin-bottom:16px;">
+                    <img id="status-photo-img" alt="Aperçu de la photo du statut" style="width:100%;border-radius:12px;">
+                </div>
+                <button class="secondary-btn" onclick="document.getElementById('status-photo-input').click()">📷 Ajouter une photo (optionnel)</button>
+                <input type="file" id="status-photo-input" accept="image/*" hidden onchange="previewStatusPhoto(event)">
+                <textarea id="status-text-input" class="status-textarea" placeholder="Quoi de neuf ?" rows="4"></textarea>
+                <button class="primary-btn" onclick="publishStatus()">Publier</button>
+            </div>
+        </div>
+
+        <!-- --- VISIONNEUSE DE STATUT --- -->
+        <div id="status-viewer-sub-page" class="sub-page-panel" role="dialog" aria-label="Statut">
+            <div class="sub-page-header">
+                <div class="header-left">
+                    <button class="back-btn" aria-label="Fermer" onclick="closeSubPage('status-viewer-sub-page')">←</button>
+                    <div><h2>Mon Statut</h2><p id="status-viewer-time"></p></div>
+                </div>
+                <div class="header-right-icons">
+                    <button aria-label="Supprimer le statut" style="color:#f87171;" onclick="deleteCurrentStatus()">🗑️</button>
+                </div>
+            </div>
+            <div style="padding:20px; flex:1; overflow-y:auto;">
+                <img id="status-viewer-img" style="width:100%;border-radius:12px;margin-bottom:16px;" hidden alt="Photo du statut">
+                <p id="status-viewer-text" style="font-size:16px; line-height:1.5;"></p>
+            </div>
+        </div>
+
+        <!-- --- FENÊTRE DE CONVERSATION --- -->
+        <div id="chat-window-sub-page" class="sub-page-panel" role="dialog" aria-label="Conversation">
+            <div class="sub-page-header">
+                <div class="header-left">
+                    <button class="back-btn" aria-label="Retour" onclick="closeSubPage('chat-window-sub-page')">←</button>
+                    <div>
+                        <h2 id="chat-window-title">Contact</h2>
+                        <p id="chat-window-status">En ligne</p>
+                    </div>
+                </div>
+            </div>
+            <div id="chat-messages" class="chat-messages"></div>
+            <div class="chat-input-row">
+                <input id="chat-input" type="text" placeholder="Message" aria-label="Écrire un message" onkeydown="if(event.key==='Enter'){sendMessage();}">
+                <button class="send-btn" aria-label="Envoyer le message" onclick="sendMessage()">➤</button>
+            </div>
+        </div>
+
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <div class="bottom-nav" role="tablist">
+        <button class="nav-item active" role="tab" aria-selected="true" onclick="switchMainTab('chats', 0)">
+            <div class="icon-wrapper" aria-hidden="true">💬</div><span>Discussions</span>
+        </button>
+        <button class="nav-item" role="tab" aria-selected="false" onclick="switchMainTab('status', 1)">
+            <div class="icon-wrapper" aria-hidden="true">⭕</div><span>Actus</span>
+        </button>
+        <button class="nav-item" role="tab" aria-selected="false" onclick="switchMainTab('communities', 2)">
+            <div class="icon-wrapper" aria-hidden="true">👥</div><span>Communautés</span>
+        </button>
+        <button class="nav-item" role="tab" aria-selected="false" onclick="switchMainTab('calls', 3)">
+            <div class="icon-wrapper" aria-hidden="true">📞</div><span>Appels</span>
+        </button>
+    </div>
+
+    <script>
+        // ============ UTILITAIRES ============
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str == null ? '' : String(str);
+            return div.innerHTML;
+        }
+
+        function timeAgo(timestamp) {
+            const diff = Math.max(0, Date.now() - timestamp);
+            const min = Math.floor(diff / 60000);
+            if (min < 1) return "à l'instant";
+            if (min < 60) return `il y a ${min} min`;
+            const h = Math.floor(min / 60);
+            if (h < 24) return `il y a ${h} h`;
+            return `il y a ${Math.floor(h / 24)} j`;
+        }
+
+        let toastTimer = null;
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toast.classList.remove('show'), 2400);
+        }
+
+        function openSubPage(pageId) { document.getElementById(pageId).classList.add('open'); }
+        function closeSubPage(pageId) { document.getElementById(pageId).classList.remove('open'); }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.sub-page-panel.open').forEach(p => p.classList.remove('open'));
+            }
+        });
+
+        // ============ ÉTAT DE L'APPLICATION (en mémoire, session uniquement) ============
+        const conversations = {
+            'IA SocialConnect': [{ from: 'them', text: 'Bonjour ! Prêt à discuter avec moi ?' }]
+        };
+        let currentChat = null;
+        let currentChatFilter = 'all';
+        let currentSearchTerm = '';
+
+        const settings = { onlineStatus: true, readReceipts: true, notifSound: true, notifPreview: true };
+
+        let contacts = [
+            { name: 'Malala', mood: 'Disponible', avatarClass: 'avatar-rose', emoji: '👩', greeting: '👋 Salut ! Tu es sur SocialConnect ?' },
+            { name: 'Anja', mood: 'Occupé', avatarClass: 'avatar-blue', emoji: '👦', greeting: 'Hey ! Regarde ma nouvelle application !' },
+            { name: 'Faly', mood: "À l'école", avatarClass: 'avatar-amber', emoji: '👨', greeting: 'Rejoignez-moi sur SocialConnect' }
+        ];
+
+        let statuses = [];
+        let currentStatusId = null;
+        let communities = [];
+
+        // ============ NAVIGATION PRINCIPALE ============
+        const fabConfig = {
+            chats: { icon: '💬', label: 'Nouvelle discussion', action: () => openContactsPage() },
+            status: { icon: '📷', label: 'Ajouter un statut', action: () => openStatusComposer() },
+            communities: { icon: '➕', label: 'Nouvelle communauté', action: () => openNewCommunityForm() },
+            calls: { icon: '📞', label: 'Nouvel appel', action: () => createCallLink() }
+        };
+
+        function switchMainTab(sectionId, index) {
+            document.querySelectorAll('.nav-item').forEach((item, i) => {
+                item.classList.toggle('active', i === index);
+                item.setAttribute('aria-selected', i === index ? 'true' : 'false');
+            });
+            document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
+            document.getElementById(sectionId + '-section').classList.add('active');
+
+            const config = fabConfig[sectionId];
+            const fab = document.getElementById('fab-main');
+            fab.textContent = config.icon;
+            fab.setAttribute('aria-label', config.label);
+            fab.onclick = config.action;
+        }
+
+        // ============ ÉDITION DE PROFIL (générique : nom, statut, téléphone, e-mail) ============
+        function startProfileEdit(field) {
+            const text = document.getElementById(`profile-${field}-text`);
+            const input = document.getElementById(`profile-${field}-input`);
+            input.value = text.textContent;
+            text.hidden = true;
+            input.hidden = false;
+            input.focus();
+            input.select();
+        }
+
+        function saveProfileEdit(field) {
+            const text = document.getElementById(`profile-${field}-text`);
+            const input = document.getElementById(`profile-${field}-input`);
+            if (input.hidden) return;
+            const value = input.value.trim();
+            if (value) text.textContent = value;
+            input.hidden = true;
+            text.hidden = false;
+            saveState();
+        }
+
+        function toggleProfileEdit(field) {
+            const input = document.getElementById(`profile-${field}-input`);
+            if (input.hidden) startProfileEdit(field); else saveProfileEdit(field);
+        }
+
+        // ============ PHOTO DE PROFIL (réelle, via FileReader) ============
+        function handleAvatarUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = () => {
+                const btn = document.getElementById('profile-avatar-btn');
+                btn.style.backgroundImage = `url(${reader.result})`;
+                btn.textContent = '';
+                saveState();
+            };
+            reader.readAsDataURL(file);
+            event.target.value = '';
+        }
+
+        function resetProfileAvatar() {
+            const btn = document.getElementById('profile-avatar-btn');
+            btn.style.backgroundImage = '';
+            btn.textContent = '🙂';
+        }
+
+        // ============ THÈME ============
+        function toggleTheme(isDark) {
+            document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+            const colorScheme = document.querySelector('meta[name="color-scheme"]');
+            if (colorScheme) colorScheme.setAttribute('content', isDark ? 'dark' : 'light');
+        }
+
+        // ============ RÉGLAGES (confidentialité / notifications) ============
+        function updateSetting(key, value) {
+            settings[key] = value;
+            if (key === 'onlineStatus' && currentChat) updateChatHeaderStatus();
+        }
+
+        function updateChatHeaderStatus() {
+            document.getElementById('chat-window-status').textContent = settings.onlineStatus ? 'En ligne' : 'Vu récemment';
+        }
+
+        function playNotificationSound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.frequency.value = 880;
+                osc.type = 'sine';
+                gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.3);
+                osc.connect(gain).connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.3);
+            } catch (e) { /* audio non disponible dans cet environnement */ }
+        }
+
+        // ============ RECHERCHE ET FILTRES DE LA LISTE DE DISCUSSIONS ============
+        function applyChatVisibility() {
+            const rows = document.querySelectorAll('#chats-list .item-row');
+            let visibleCount = 0;
+            rows.forEach(row => {
+                const name = row.dataset.name.toLowerCase();
+                const matchesSearch = name.includes(currentSearchTerm.toLowerCase());
+                const matchesFilter =
+                    currentChatFilter === 'all' ||
+                    (currentChatFilter === 'unread' && row.dataset.unread === 'true') ||
+                    (currentChatFilter === 'favorite' && row.dataset.favorite === 'true') ||
+                    (currentChatFilter === 'group' && row.dataset.group === 'true');
+                const visible = matchesSearch && matchesFilter;
+                row.hidden = !visible;
+                if (visible) visibleCount++;
+            });
+            document.getElementById('chats-empty-state').hidden = visibleCount > 0;
+        }
+
+        function filterChatsBySearch(value) { currentSearchTerm = value; applyChatVisibility(); }
+
+        function setChatFilter(filter) {
+            currentChatFilter = filter;
+            document.querySelectorAll('.filter-badge').forEach(badge => badge.classList.toggle('active', badge.dataset.filter === filter));
+            applyChatVisibility();
+        }
+
+        // ============ LISTE DE DISCUSSIONS ============
+        function addChatRow(name, previewText, opts = {}) {
+            const { unread = false, favorite = false, group = false, emoji = '👤', bgClass = '' } = opts;
+            const chatsList = document.getElementById('chats-list');
+            const row = document.createElement('button');
+            row.className = 'item-row';
+            row.dataset.name = name;
+            row.dataset.unread = unread ? 'true' : 'false';
+            row.dataset.favorite = favorite ? 'true' : 'false';
+            row.dataset.group = group ? 'true' : 'false';
+            row.onclick = () => openChat(name);
+            row.innerHTML = `
+                <div class="avatar-mock ${bgClass}" aria-hidden="true">${emoji}</div>
+                <div class="item-text"><div class="text-main"><h3>${escapeHtml(name)}</h3><p>${escapeHtml(previewText)}</p></div></div>
+            `;
+            chatsList.insertBefore(row, chatsList.firstChild);
+            applyChatVisibility();
+        }
+
+        function updateChatPreview(name, text, markUnread) {
+            const row = document.querySelector(`#chats-list .item-row[data-name="${CSS.escape(name)}"]`);
+            if (!row) return;
+            if (text !== undefined) {
+                const displayText = (markUnread && !settings.notifPreview) ? 'Nouveau message' : text;
+                row.querySelector('p').textContent = displayText;
+            }
+            if (markUnread !== undefined) row.dataset.unread = markUnread ? 'true' : 'false';
+            applyChatVisibility();
+        }
+
+        // ============ CONVERSATION ============
+        function renderMessages(name) {
+            const container = document.getElementById('chat-messages');
+            container.innerHTML = '';
+            (conversations[name] || []).forEach(msg => {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble ' + (msg.from === 'me' ? 'me' : 'them');
+                bubble.textContent = msg.text;
+                if (msg.from === 'me' && settings.readReceipts) {
+                    const tick = document.createElement('span');
+                    tick.className = 'read-receipt';
+                    tick.textContent = msg.status === 'read' ? ' ✓✓' : ' ✓';
+                    if (msg.status === 'read') tick.style.color = 'var(--accent)';
+                    bubble.appendChild(tick);
+                }
+                container.appendChild(bubble);
+            });
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function openChat(name) {
+            closeSubPage('contacts-sub-page');
+            closeSubPage('community-detail-sub-page');
+            currentChat = name;
+            document.getElementById('chat-window-title').textContent = name;
+            updateChatHeaderStatus();
+            renderMessages(name);
+            updateChatPreview(name, undefined, false);
+            openSubPage('chat-window-sub-page');
+            document.getElementById('chat-input').focus();
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text || !currentChat) return;
+
+            conversations[currentChat] = conversations[currentChat] || [];
+            conversations[currentChat].push({ from: 'me', text, status: 'sent' });
+            renderMessages(currentChat);
+            updateChatPreview(currentChat, text);
+            input.value = '';
+            saveState();
+
+            if (currentChat === 'IA SocialConnect') {
+                const chatAtSendTime = currentChat;
+                setTimeout(() => {
+                    const msgs = conversations[chatAtSendTime];
+                    if (!msgs) return;
+                    const lastMine = [...msgs].reverse().find(m => m.from === 'me');
+                    if (lastMine) lastMine.status = 'read';
+                    const reply = "Je suis une IA de démonstration, mais ravie d'échanger avec toi !";
+                    msgs.push({ from: 'them', text: reply });
+                    if (currentChat === chatAtSendTime) renderMessages(chatAtSendTime);
+                    updateChatPreview(chatAtSendTime, reply, true);
+                    saveState();
+                    if (settings.notifSound) playNotificationSound();
+                }, 700);
+            }
+        }
+
+        // ============ CONTACTS ============
+        function openContactsPage() {
+            const search = document.getElementById('contacts-search-input');
+            if (search) search.value = '';
+            renderContactsList();
+            openSubPage('contacts-sub-page');
+        }
+
+        function renderContactsList(filter = '') {
+            const container = document.getElementById('contacts-list');
+            container.innerHTML = '';
+            contacts
+                .filter(c => c.name.toLowerCase().includes(filter.trim().toLowerCase()))
+                .forEach(c => {
+                    const btn = document.createElement('button');
+                    btn.className = 'item-row';
+                    btn.onclick = () => createNewChat(c.name, c.greeting);
+                    btn.innerHTML = `
+                        <div class="avatar-mock ${c.avatarClass}" aria-hidden="true">${c.emoji}</div>
+                        <div class="item-text"><div class="text-main"><h3>${escapeHtml(c.name)}</h3><p>${escapeHtml(c.mood)}</p></div></div>
+                    `;
+                    container.appendChild(btn);
+                });
+            document.getElementById('contacts-count').textContent = `${contacts.length} contact${contacts.length > 1 ? 's' : ''}`;
+        }
+
+        function openNewContactForm() {
+            document.getElementById('new-contact-name').value = '';
+            openSubPage('new-contact-sub-page');
+            document.getElementById('new-contact-name').focus();
+        }
+
+        function addNewContact() {
+            const input = document.getElementById('new-contact-name');
+            const name = input.value.trim();
+            if (!name) { showToast('Entre un nom'); return; }
+            if (contacts.some(c => c.name.toLowerCase() === name.toLowerCase())) { showToast('Ce contact existe déjà'); return; }
+            const colors = ['avatar-rose', 'avatar-blue', 'avatar-amber', 'avatar-green'];
+            const emojis = ['🙂', '🐱', '🦊', '⭐', '🌟', '🎈'];
+            contacts.push({
+                name,
+                mood: 'Nouveau sur SocialConnect',
+                avatarClass: colors[Math.floor(Math.random() * colors.length)],
+                emoji: emojis[Math.floor(Math.random() * emojis.length)],
+                greeting: `👋 Salut, ${name} a rejoint SocialConnect !`
+            });
+            renderContactsList();
+            closeSubPage('new-contact-sub-page');
+            showToast(`${name} ajouté à tes contacts`);
+            saveState();
+        }
+
+        function createNewChat(contactName, defaultMessage) {
+            const existingRow = document.querySelector(`#chats-list .item-row[data-name="${CSS.escape(contactName)}"]`);
+            if (existingRow) {
+                closeSubPage('contacts-sub-page');
+                showToast(`La discussion avec ${contactName} existe déjà`);
+                openChat(contactName);
+                return;
+            }
+            conversations[contactName] = [{ from: 'them', text: defaultMessage }];
+            const emojis = ['👤', '🐱', '🦊', '⭐'];
+            addChatRow(contactName, defaultMessage, { unread: true, emoji: emojis[Math.floor(Math.random() * emojis.length)] });
+            closeSubPage('contacts-sub-page');
+            openChat(contactName);
+        }
+
+        // ============ NOUVEAU GROUPE ============
+        function openNewGroupForm() {
+            document.getElementById('new-group-name').value = '';
+            renderGroupContactPicker();
+            openSubPage('new-group-sub-page');
+        }
+
+        function renderGroupContactPicker() {
+            const container = document.getElementById('group-contact-picker');
+            container.innerHTML = '';
+            contacts.forEach((c, i) => {
+                const label = document.createElement('label');
+                label.className = 'item-row';
+                label.style.cursor = 'pointer';
+                label.innerHTML = `
+                    <div class="avatar-mock ${c.avatarClass}" aria-hidden="true">${c.emoji}</div>
+                    <div class="item-text">
+                        <div class="text-main"><h3>${escapeHtml(c.name)}</h3></div>
+                        <input type="checkbox" class="group-member-checkbox" value="${i}" style="width:20px;height:20px;" aria-label="Sélectionner ${escapeHtml(c.name)}">
+                    </div>
+                `;
+                container.appendChild(label);
+            });
+        }
+
+        function createGroup() {
+            const name = document.getElementById('new-group-name').value.trim();
+            const checked = Array.from(document.querySelectorAll('.group-member-checkbox:checked')).map(cb => contacts[+cb.value]);
+            if (!name) { showToast('Donne un nom au groupe'); return; }
+            if (checked.length < 1) { showToast('Sélectionne au moins un membre'); return; }
+            if (document.querySelector(`#chats-list .item-row[data-name="${CSS.escape(name)}"]`)) { showToast('Une discussion porte déjà ce nom'); return; }
+
+            const firstMsg = `Groupe créé avec ${checked.map(c => c.name).join(', ')}`;
+            conversations[name] = [{ from: 'them', text: firstMsg }];
+            addChatRow(name, firstMsg, { group: true, emoji: '👥', bgClass: 'avatar-green' });
+            closeSubPage('new-group-sub-page');
+            closeSubPage('contacts-sub-page');
+            showToast(`Groupe « ${name} » créé`);
+            openChat(name);
+        }
+
+        // ============ COMMUNAUTÉS ============
+        function openNewCommunityForm() {
+            document.getElementById('new-community-name').value = '';
+            document.getElementById('new-community-desc').value = '';
+            renderCommunityContactPicker();
+            openSubPage('new-community-sub-page');
+        }
+
+        function renderCommunityContactPicker() {
+            const container = document.getElementById('community-contact-picker');
+            container.innerHTML = '';
+            contacts.forEach((c, i) => {
+                const label = document.createElement('label');
+                label.className = 'item-row';
+                label.style.cursor = 'pointer';
+                label.innerHTML = `
+                    <div class="avatar-mock ${c.avatarClass}" aria-hidden="true">${c.emoji}</div>
+                    <div class="item-text">
+                        <div class="text-main"><h3>${escapeHtml(c.name)}</h3></div>
+                        <input type="checkbox" class="community-member-checkbox" value="${i}" style="width:20px;height:20px;" aria-label="Sélectionner ${escapeHtml(c.name)}">
+                    </div>
+                `;
+                container.appendChild(label);
+            });
+        }
+
+        function createCommunity() {
+            const name = document.getElementById('new-community-name').value.trim();
+            const desc = document.getElementById('new-community-desc').value.trim();
+            const members = Array.from(document.querySelectorAll('.community-member-checkbox:checked')).map(cb => contacts[+cb.value].name);
+            if (!name) { showToast('Donne un nom à la communauté'); return; }
+            if (communities.some(c => c.name.toLowerCase() === name.toLowerCase())) { showToast('Ce nom est déjà utilisé'); return; }
+            communities.push({ name, desc, members });
+            renderCommunitiesList();
+            closeSubPage('new-community-sub-page');
+            showToast(`Communauté « ${name} » créée`);
+        }
+
+        function renderCommunitiesList() {
+            const list = document.getElementById('communities-list');
+            list.innerHTML = '';
+            communities.forEach(c => {
+                const btn = document.createElement('button');
+                btn.className = 'item-row';
+                btn.onclick = () => openCommunityDetail(c.name);
+                btn.innerHTML = `
+                    <div class="avatar-mock avatar-green" aria-hidden="true">👨‍👩‍👧‍👦</div>
+                    <div class="item-text"><div class="text-main"><h3>${escapeHtml(c.name)}</h3><p>${c.members.length} membre(s)</p></div></div>
+                `;
+                list.appendChild(btn);
+            });
+        }
+
+        function openCommunityDetail(name) {
+            const community = communities.find(c => c.name === name);
+            if (!community) return;
+            document.getElementById('community-detail-name').textContent = community.name;
+            document.getElementById('community-detail-desc').textContent = community.desc || 'Aucune description.';
+            const membersList = document.getElementById('community-detail-members');
+            membersList.innerHTML = community.members.length
+                ? community.members.map(m => `<p style="padding:6px 0;">• ${escapeHtml(m)}</p>`).join('')
+                : '<p style="color:var(--text-secondary);">Aucun membre pour le moment.</p>';
+            document.getElementById('community-open-chat-btn').onclick = () => {
+                closeSubPage('community-detail-sub-page');
+                const chatName = `Groupe ${community.name}`;
+                if (!conversations[chatName]) {
+                    conversations[chatName] = [{ from: 'them', text: `Bienvenue dans la discussion de ${community.name} !` }];
+                    addChatRow(chatName, conversations[chatName][0].text, { group: true, emoji: '👨‍👩‍👧‍👦', bgClass: 'avatar-green' });
+                }
+                switchMainTab('chats', 0);
+                openChat(chatName);
+            };
+            openSubPage('community-detail-sub-page');
+        }
+
+        // ============ STATUTS ============
+        function openStatusComposer() {
+            document.getElementById('status-text-input').value = '';
+            document.getElementById('status-photo-preview').hidden = true;
+            document.getElementById('status-photo-img').src = '';
+            openSubPage('status-composer-sub-page');
+        }
+
+        function previewStatusPhoto(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = () => {
+                document.getElementById('status-photo-img').src = reader.result;
+                document.getElementById('status-photo-preview').hidden = false;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function publishStatus() {
+            const text = document.getElementById('status-text-input').value.trim();
+            const preview = document.getElementById('status-photo-preview');
+            const img = document.getElementById('status-photo-img').src;
+            const hasImage = !preview.hidden && img;
+            if (!text && !hasImage) { showToast('Ajoute un texte ou une photo avant de publier'); return; }
+
+            statuses.unshift({ id: Date.now(), text, image: hasImage ? img : null, time: Date.now() });
+            renderStatuses();
+            closeSubPage('status-composer-sub-page');
+            switchMainTab('status', 1);
+            showToast('Statut publié');
+            saveState();
+        }
+
+        function renderStatuses() {
+            const list = document.getElementById('statuses-list');
+            const title = document.getElementById('statuses-section-title');
+            list.innerHTML = '';
+            title.hidden = statuses.length === 0;
+            document.getElementById('my-status-subtitle').textContent = statuses.length
+                ? `${statuses.length} mise(s) à jour · ${timeAgo(statuses[0].time)}`
+                : 'Appuyez pour ajouter une mise à jour';
+
+            statuses.forEach(status => {
+                const btn = document.createElement('button');
+                btn.className = 'item-row';
+                btn.onclick = () => openStatusViewer(status.id);
+                const thumb = status.image
+                    ? `<img src="${status.image}" alt="" style="width:48px;height:48px;border-radius:50%;object-fit:cover;margin-right:15px;flex-shrink:0;">`
+                    : `<div class="avatar-mock avatar-ring" aria-hidden="true">👤</div>`;
+                btn.innerHTML = `${thumb}
+                    <div class="item-text"><div class="text-main">
+                        <h3>Vous</h3>
+                        <p>${escapeHtml(status.text || 'Photo')} · ${timeAgo(status.time)}</p>
+                    </div></div>`;
+                list.appendChild(btn);
+            });
+        }
+
+        function openStatusViewer(id) {
+            const status = statuses.find(s => s.id === id);
+            if (!status) return;
+            currentStatusId = id;
+            document.getElementById('status-viewer-time').textContent = timeAgo(status.time);
+            document.getElementById('status-viewer-text').textContent = status.text || '';
+            const img = document.getElementById('status-viewer-img');
+            if (status.image) { img.src = status.image; img.hidden = false; } else { img.hidden = true; }
+            openSubPage('status-viewer-sub-page');
+        }
+
+        function deleteCurrentStatus() {
+            statuses = statuses.filter(s => s.id !== currentStatusId);
+            renderStatuses();
+            closeSubPage('status-viewer-sub-page');
+            showToast('Statut supprimé');
+            saveState();
+        }
+
+        // ============ APPELS ============
+        function createCallLink() {
+            const code = Math.random().toString(36).slice(2, 10);
+            const link = `https://socialconnect.app/appel/${code}`;
+            const list = document.getElementById('call-links-list');
+            document.getElementById('call-links-title').hidden = false;
+
+            const wrapper = document.createElement('div');
+            wrapper.style.borderBottom = '1px solid var(--border)';
+
+            const row = document.createElement('div');
+            row.className = 'item-row';
+            row.style.cursor = 'default';
+            row.style.borderBottom = 'none';
+            row.innerHTML = `
+                <div class="avatar-mock" aria-hidden="true">🔗</div>
+                <div class="item-text"><div class="text-main"><h3>Lien d'appel</h3><p>${link}</p></div></div>
+            `;
+
+            const actions = document.createElement('div');
+            actions.style.display = 'flex';
+            actions.style.gap = '8px';
+            actions.style.padding = '0 20px 14px 83px';
+
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'small-btn';
+            copyBtn.textContent = 'Copier';
+            copyBtn.onclick = () => copyToClipboard(link);
+            actions.appendChild(copyBtn);
+
+            if (navigator.share) {
+                const shareBtn = document.createElement('button');
+                shareBtn.className = 'small-btn';
+                shareBtn.textContent = 'Partager';
+                shareBtn.onclick = () => navigator.share({ title: 'SocialConnect', text: "Rejoins mon appel sur SocialConnect", url: link }).catch(() => {});
+                actions.appendChild(shareBtn);
+            }
+
+            wrapper.appendChild(row);
+            wrapper.appendChild(actions);
+            list.insertBefore(wrapper, list.firstChild);
+            showToast('Lien créé');
+        }
+
+        async function copyToClipboard(text) {
+            try {
+                await navigator.clipboard.writeText(text);
+                showToast('Lien copié !');
+            } catch (err) {
+                showToast('Copie indisponible ici — sélectionne le lien manuellement');
+            }
+        }
+
+        // ============ INVITER UN AMI (partage natif réel) ============
+        async function inviteFriend() {
+            const text = 'Rejoins-moi sur SocialConnect !';
+            const url = location.href;
+            if (navigator.share) {
+                try { await navigator.share({ title: 'SocialConnect', text, url }); return; } catch (e) { /* annulé */ }
+            }
+            try {
+                await navigator.clipboard.writeText(`${text} ${url}`);
+                showToast("Lien d'invitation copié !");
+            } catch (e) {
+                showToast('Partage indisponible dans cet environnement');
+            }
+        }
+
+        // ============ STOCKAGE ============
+        function openStorageSettings() {
+            const convCount = Object.keys(conversations).length;
+            const msgCount = Object.values(conversations).reduce((sum, msgs) => sum + msgs.length, 0);
+            document.getElementById('storage-stats').textContent =
+                `${convCount} discussion(s) · ${msgCount} message(s) en mémoire pour cette session.`;
+            openSubPage('storage-sub-page');
+        }
+
+        let clearChatsArmed = false;
+        function confirmClearChats() {
+            const btn = document.getElementById('clear-chats-btn');
+            if (!clearChatsArmed) {
+                clearChatsArmed = true;
+                btn.textContent = 'Confirmer la suppression ?';
+                setTimeout(() => { clearChatsArmed = false; btn.textContent = 'Vider toutes les discussions'; }, 4000);
+                return;
+            }
+            clearChatsArmed = false;
+            btn.textContent = 'Vider toutes les discussions';
+
+            for (const key of Object.keys(conversations)) {
+                if (key !== 'IA SocialConnect') delete conversations[key];
+            }
+            conversations['IA SocialConnect'] = [{ from: 'them', text: 'Bonjour ! Prêt à discuter avec moi ?' }];
+
+            document.querySelectorAll('#chats-list .item-row').forEach(row => {
+                if (row.dataset.name !== 'IA SocialConnect') row.remove();
+            });
+            const iaRow = document.querySelector('#chats-list .item-row[data-name="IA SocialConnect"]');
+            if (iaRow) { iaRow.querySelector('p').textContent = 'Bonjour ! Prêt à discuter avec moi ?'; iaRow.dataset.unread = 'false'; }
+            applyChatVisibility();
+            closeSubPage('storage-sub-page');
+            showToast('Discussions vidées');
+        }
+
+        // ============ DÉCONNEXION (réinitialisation réelle de la session) ============
+        let logoutArmed = false;
+        function confirmLogout(btn) {
+            if (!logoutArmed) {
+                logoutArmed = true;
+                btn.querySelector('h3').textContent = 'Confirmer la déconnexion ?';
+                setTimeout(() => { logoutArmed = false; btn.querySelector('h3').textContent = 'Se déconnecter'; }, 4000);
+                return;
+            }
+            logoutArmed = false;
+            resetApp();
+        }
+
+        function resetApp() {
+            clearSavedState();
+            contacts = [
+                { name: 'Malala', mood: 'Disponible', avatarClass: 'avatar-rose', emoji: '👩', greeting: '👋 Salut ! Tu es sur SocialConnect ?' },
+                { name: 'Anja', mood: 'Occupé', avatarClass: 'avatar-blue', emoji: '👦', greeting: 'Hey ! Regarde ma nouvelle application !' },
+                { name: 'Faly', mood: "À l'école", avatarClass: 'avatar-amber', emoji: '👨', greeting: 'Rejoignez-moi sur SocialConnect' }
+            ];
+            statuses = [];
+            communities = [];
+            for (const key of Object.keys(conversations)) delete conversations[key];
+            conversations['IA SocialConnect'] = [{ from: 'them', text: 'Bonjour ! Prêt à discuter avec moi ?' }];
+
+            document.querySelectorAll('#chats-list .item-row').forEach(row => {
+                if (row.dataset.name !== 'IA SocialConnect') row.remove();
+            });
+            const iaRow = document.querySelector('#chats-list .item-row[data-name="IA SocialConnect"]');
+            if (iaRow) { iaRow.querySelector('p').textContent = 'Bonjour ! Prêt à discuter avec moi ?'; iaRow.dataset.unread = 'false'; }
+
+            document.getElementById('profile-name-text').textContent = 'Votre nom';
+            document.getElementById('profile-status-text').textContent = "Salut ! J'utilise SocialConnect";
+            document.getElementById('profile-account-phone-text').textContent = '+33 6 12 34 56 78';
+            document.getElementById('profile-account-email-text').textContent = 'vous@example.com';
+            resetProfileAvatar();
+
+            renderStatuses();
+            renderCommunitiesList();
+            renderContactsList();
+            applyChatVisibility();
+
+            document.querySelectorAll('.sub-page-panel.open').forEach(p => p.classList.remove('open'));
+            switchMainTab('chats', 0);
+            showToast('Déconnecté — toutes les données de la session ont été réinitialisées');
+        }
+
+        // ============ SAUVEGARDE LOCALE (persistance après actualisation) ============
+        const STORAGE_KEY = 'socialconnect_state_v1';
+
+        function saveState() {
+            try {
+                const avatarBtn = document.getElementById('profile-avatar-btn');
+                const state = {
+                    conversations,
+                    statuses,
+                    contacts,
+                    communities,
+                    settings,
+                    profile: {
+                        name: document.getElementById('profile-name-text')?.textContent,
+                        statusText: document.getElementById('profile-status-text')?.textContent,
+                        phone: document.getElementById('profile-account-phone-text')?.textContent,
+                        email: document.getElementById('profile-account-email-text')?.textContent,
+                        avatar: avatarBtn ? avatarBtn.style.backgroundImage : ''
+                    },
+                    chatMeta: Array.from(document.querySelectorAll('#chats-list .item-row')).map(row => ({
+                        name: row.dataset.name,
+                        unread: row.dataset.unread,
+                        preview: row.querySelector('p')?.textContent
+                    }))
+                };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            } catch (e) {
+                console.warn('Sauvegarde impossible :', e);
+            }
+        }
+
+        function loadState() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return;
+                const state = JSON.parse(raw);
+
+                if (state.conversations) {
+                    for (const key of Object.keys(conversations)) delete conversations[key];
+                    Object.assign(conversations, state.conversations);
+                }
+                if (Array.isArray(state.statuses)) statuses = state.statuses;
+                if (Array.isArray(state.contacts)) contacts = state.contacts;
+                if (Array.isArray(state.communities)) communities = state.communities;
+                if (state.settings) Object.assign(settings, state.settings);
+
+                if (state.profile) {
+                    const p = state.profile;
+                    const setText = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
+                    setText('profile-name-text', p.name);
+                    setText('profile-status-text', p.statusText);
+                    setText('profile-account-phone-text', p.phone);
+                    setText('profile-account-email-text', p.email);
+                    if (p.avatar) {
+                        const btn = document.getElementById('profile-avatar-btn');
+                        if (btn && p.avatar !== 'none' && p.avatar !== '') {
+                            btn.style.backgroundImage = p.avatar;
+                            btn.textContent = '';
+                        }
+                    }
+                }
+
+                if (Array.isArray(state.chatMeta)) {
+                    state.chatMeta.forEach(meta => {
+                        const row = document.querySelector(`#chats-list .item-row[data-name="${CSS.escape(meta.name)}"]`);
+                        if (row) {
+                            if (meta.preview !== undefined) row.querySelector('p').textContent = meta.preview;
+                            if (meta.unread !== undefined) row.dataset.unread = meta.unread;
+                        }
+                    });
+                }
+            } catch (e) {
+                console.warn('Chargement impossible, données ignorées :', e);
+            }
+        }
+
+        function clearSavedState() {
+            try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* ignore */ }
+        }
+
+        // ============ ARRIVÉE DEPUIS LA PAGE DE CONNEXION ============
+        function applyPhoneFromLogin() {
+            const params = new URLSearchParams(window.location.search);
+            const phone = params.get('phone');
+            if (!phone) return;
+
+            const phoneText = document.getElementById('profile-account-phone-text');
+            if (phoneText) phoneText.textContent = phone;
+
+            showToast(`Connecté avec le numéro ${phone}`);
+            saveState();
+
+            // Nettoie l'URL pour ne pas garder le paramètre affiché dans la barre d'adresse
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        // ============ INITIALISATION ============
+        loadState();
+        renderContactsList();
+        renderStatuses();
+        renderCommunitiesList();
+        applyPhoneFromLogin();
+    </script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B3D2E"/>
+      <stop offset="100%" stop-color="#145C45"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Fond arrondi façon icône d'app -->
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+
+  <!-- Grand S -->
+  <text x="256" y="340" font-family="Arial, Helvetica, sans-serif" font-size="300" font-weight="800"
+        fill="#FFFFFF" text-anchor="middle">S</text>
+
+  <!-- petit détail réseau (points reliés) en bas, discret -->
+  <g transform="translate(150,400)" opacity="0.85">
+    <circle cx="0" cy="20" r="8" fill="#A7F3D0"/>
+    <circle cx="212" cy="0" r="8" fill="#A7F3D0"/>
+    <circle cx="212" cy="40" r="8" fill="#A7F3D0"/>
+    <line x1="0" y1="20" x2="212" y2="0" stroke="#A7F3D0" stroke-width="3"/>
+    <line x1="0" y1="20" x2="212" y2="40" stroke="#A7F3D0" stroke-width="3"/>
+  </g>
+</svg>
